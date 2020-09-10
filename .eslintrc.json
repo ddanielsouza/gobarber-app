@@ -55,7 +55,9 @@
       {
         "ExportDeclaration": { "multiline": true, "minProperties": 3 }
       }
-    ]
+    ],
+    "operator-linebreak" :"off",
+    "implicit-arrow-linebreak": "off"
   },
   "settings": {
     "import/resolver": {
