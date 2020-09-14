@@ -18,62 +18,66 @@ import logoImg from '../../assets/logo.png';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import getValidationErrors from '../../utils/getValidationErrors';
+import api from '../../services/api';
+
+interface SignUpFormDate {
+  email: string;
+  password: string;
+  name: string;
+}
 
 const SignUp: React.FC = () => {
   const navigation = useNavigation();
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
   const emailInputRef = useRef<TextInput>(null);
-  interface SignUpFormDate {
-    email: string;
-    password: string;
-    name: string;
-  }
 
-  const handleSignUp = useCallback(async (data: SignUpFormDate): Promise<
-    void
-  > => {
-    const messageRequired = (fieldDescription: string) =>
-      `${fieldDescription} é obrigatório(a)`;
+  const handleSignUp = useCallback(
+    async (data: SignUpFormDate): Promise<void> => {
+      const messageRequired = (fieldDescription: string) =>
+        `${fieldDescription} é obrigatório(a)`;
 
-    const messageInvalid = (fieldDescription: string) =>
-      `${fieldDescription} está inválido(a), confira os dados preenchidos`;
+      const messageInvalid = (fieldDescription: string) =>
+        `${fieldDescription} está inválido(a), confira os dados preenchidos`;
 
-    try {
-      formRef.current?.setErrors({});
+      try {
+        formRef.current?.setErrors({});
 
-      const schema = Yup.object().shape({
-        name: Yup.string().required(messageRequired('Nome')),
-        email: Yup.string()
-          .required(messageRequired('E-mail'))
-          .email(messageInvalid('E-mail')),
-        password: Yup.string().min(
-          6,
-          'Preencha a senha com no mínimo 6 digitos',
-        ),
-      });
+        const schema = Yup.object().shape({
+          name: Yup.string().required(messageRequired('Nome')),
+          email: Yup.string()
+            .required(messageRequired('E-mail'))
+            .email(messageInvalid('E-mail')),
+          password: Yup.string().min(
+            6,
+            'Preencha a senha com no mínimo 6 digitos',
+          ),
+        });
 
-      await schema.validate(data, {
-        abortEarly: false,
-      });
+        await schema.validate(data, {
+          abortEarly: false,
+        });
 
-      // await api.post('/users', data);
+        await api.post('/users', data);
+        Alert.alert('Sucesso!', 'Cadastrado com sucesso');
 
-      // history.push('/');
-    } catch (err) {
-      const { ValidationError } = Yup;
+        navigation.navigate('SignIn');
+      } catch (err) {
+        const { ValidationError } = Yup;
 
-      if (err instanceof ValidationError) {
-        const errors = getValidationErrors(err);
-        formRef.current?.setErrors(errors);
-      } else {
-        Alert.alert(
-          'Erro ao cadastrar',
-          'Verifique os dados preenchidos ou tente mais tarde',
-        );
+        if (err instanceof ValidationError) {
+          const errors = getValidationErrors(err);
+          formRef.current?.setErrors(errors);
+        } else {
+          Alert.alert(
+            'Erro ao cadastrar',
+            'Verifique os dados preenchidos ou tente mais tarde',
+          );
+        }
       }
-    }
-  }, []);
+    },
+    [navigation],
+  );
 
   return (
     <>
