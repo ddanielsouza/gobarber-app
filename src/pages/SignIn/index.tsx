@@ -5,12 +5,14 @@ import {
   Platform,
   View,
   TextInput,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 import {
   Container,
   Title,
@@ -22,13 +24,59 @@ import {
 import logoImg from '../../assets/logo.png';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
+import getValidationErrors from '../../utils/getValidationErrors';
+
+interface SignInFormDate {
+  email: string;
+  password: string;
+}
 
 const SignIn: React.FC = () => {
   const navigation = useNavigation();
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
-  const handleSignIn = useCallback((data: object) => {
-    console.log('Ok', data);
+
+  const handleSignIn = useCallback(async (data: SignInFormDate): Promise<
+    void
+  > => {
+    const messageRequired = (fieldDescription: string) =>
+      `${fieldDescription} é obrigatório(a)`;
+
+    const messageInvalid = (fieldDescription: string) =>
+      `${fieldDescription} está inválido(a), confira os dados preenchidos`;
+
+    try {
+      formRef.current?.setErrors({});
+
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .required(messageRequired('E-mail'))
+          .email(messageInvalid('E-mail')),
+
+        password: Yup.string().required(messageRequired('Senha')),
+      });
+
+      await schema.validate(data, {
+        abortEarly: false,
+      });
+
+      // await signIn({
+      //   email: data.email,
+      //   password: data.password,
+      // });
+
+      // history.push('/dashboard');
+    } catch (err) {
+      if (err instanceof Yup.ValidationError) {
+        const errors = getValidationErrors(err);
+        formRef.current?.setErrors(errors);
+      } else {
+        Alert.alert(
+          'Error autenticação',
+          'Erro ao fazer login, verifique os dados inseridos',
+        );
+      }
+    }
   }, []);
 
   return (
