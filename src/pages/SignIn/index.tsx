@@ -36,8 +36,8 @@ const SignIn: React.FC = () => {
   const navigation = useNavigation();
   const formRef = useRef<FormHandles>(null);
   const passwordInputRef = useRef<TextInput>(null);
-  const { signIn, user } = useAuth();
-  console.log(user);
+  const { signIn } = useAuth();
+
   const handleSignIn = useCallback(
     async (data: SignInFormDate): Promise<void> => {
       const messageRequired = (fieldDescription: string) =>

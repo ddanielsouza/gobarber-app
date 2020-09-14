@@ -20,6 +20,7 @@ interface AuthState {
 
 interface AuthContextState {
   user: object;
+  loading: boolean;
   signIn(credentials: SignInCredentials): Promise<void>;
   signOut(): void;
 }
@@ -30,6 +31,7 @@ export const AuthContext = createContext<AuthContextState>(
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>({} as AuthState);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const loadStorageDate = async (): Promise<void> => {
@@ -42,6 +44,8 @@ export const AuthProvider: React.FC = ({ children }) => {
         const dataStoraged: AuthState = { token, user: JSON.parse(user) };
         setData(dataStoraged);
       }
+
+      setLoading(false);
     };
 
     loadStorageDate();
@@ -69,7 +73,7 @@ export const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
+    <AuthContext.Provider value={{ user: data.user, signIn, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );
