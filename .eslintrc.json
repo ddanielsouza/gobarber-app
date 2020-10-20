@@ -25,6 +25,7 @@
   "plugins": ["react", "@typescript-eslint", "react-hooks", "prettier"],
   "rules": {
     "camelcase": "off",
+    "arrow-parens": "off",
     "prettier/prettier": "error",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "warn",
